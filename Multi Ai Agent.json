@@ -1,0 +1,800 @@
+{
+  "name": "Telegram AI Bot",
+  "nodes": [
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').first().json.message.chat.id }}",
+        "text": "={{ $json.output }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1472,
+        96
+      ],
+      "id": "845bf4cd-5ca8-4652-b934-2f4c5dbe3140",
+      "name": "Send a text message",
+      "webhookId": "f28594b7-c5b4-4535-b26c-4cd940a5c57d",
+      "credentials": {
+        "telegramApi": {
+          "id": "NqY9Xqy4WbOQkv8L",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('Telegram Trigger').first().json.message.chat.id }}",
+        "contextWindowLength": 15
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        96,
+        368
+      ],
+      "id": "2c8bee29-6487-42b9-95c7-5eb2d6c94449",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.message.text }}",
+        "options": {
+          "systemMessage": "You are a helpful personal AI assistant. Reply in the same language the user writes in (Bengali, English, or mixed). Be concise and friendly. \n\nতোমার নাম Sizu। তুমি একজন creative, energetic, এবং strong-willed AI assistant।\nসাহসী এবং সরাসরি উত্তর দাও।\n\nতোমার একটা Gmail tool আছে যেটা ব্যবহার করে user-এর email access করতে পারো।\nযখনই user email check, পড়া, summarize করতে বলবে — Gmail tool ব্যবহার করো।\n\nExamples:\n- \"আমার email check করো\" → Gmail tool call করো limit=10\n- \"শেষ ৫টা email summarize করো\" → Gmail tool call করো limit=5\n- \"Unread email গুলো দেখাও\" → Gmail tool call করো search=\"is:unread\"\n- \"আজকের email\" → Gmail tool call করো search=\"newer_than:1d\"\n\nEmail summary দেওয়ার সময়:\n- প্রতিটা email-এর sender, subject, এবং key point মেনশন করো\n- বাংলায় উত্তর দাও\n- গুরুত্বপূর্ণ email কোনগুলো highlight করো\n- যেগুলোতে action দরকার সেগুলো বলো\n\nব্যবহারকারী বাংলায় কথা বললে বাংলায় উত্তর দাও।"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        -496,
+        688
+      ],
+      "id": "3ef13f83-2018-4791-ad88-698fc08ef0ad",
+      "name": "Ai Default"
+    },
+    {
+      "parameters": {
+        "model": "llama-3.3-70b-versatile",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        -496,
+        864
+      ],
+      "id": "36f19ecd-10f6-444b-bf50-14c808a798f4",
+      "name": "Groq Chat Model1",
+      "credentials": {
+        "groqApi": {
+          "id": "w2n5y2mh2QIIydrO",
+          "name": "Groq account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -1040,
+        80
+      ],
+      "id": "652eaaca-419f-40e5-8800-5706d093d22b",
+      "name": "Telegram Trigger",
+      "webhookId": "28b8608f-b040-4b72-a938-8e8eb67872ce",
+      "credentials": {
+        "telegramApi": {
+          "id": "NqY9Xqy4WbOQkv8L",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.message.text.toLowerCase() }}",
+                    "rightValue": "force",
+                    "operator": {
+                      "type": "string",
+                      "operation": "contains"
+                    },
+                    "id": "28d79e06-137f-4a30-88d2-72b2073c21c2"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Force"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "8854b7cf-6e1b-459e-9ddb-5e479fb3a8c3",
+                    "leftValue": "={{ $json.message.text.toLowerCase() }}",
+                    "rightValue": "nexus",
+                    "operator": {
+                      "type": "string",
+                      "operation": "contains"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Nexus"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "970c584b-84eb-415c-8b07-c0e97c2c86a5",
+                    "leftValue": "={{ $json.message.text.toLowerCase() }}",
+                    "rightValue": "victor",
+                    "operator": {
+                      "type": "string",
+                      "operation": "contains"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Victor"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "2a6dfa78-2bdd-4d8d-8775-d7d8facc35d9",
+                    "leftValue": "={{ $json.message.text.toLowerCase() }}",
+                    "rightValue": "team",
+                    "operator": {
+                      "type": "string",
+                      "operation": "contains"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Team"
+            }
+          ]
+        },
+        "options": {
+          "fallbackOutput": "extra",
+          "renameFallbackOutput": "Sizu"
+        }
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        -832,
+        48
+      ],
+      "id": "4ff33a7b-b579-4df8-97de-a930066e876d",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.message.text }}",
+        "options": {
+          "systemMessage": "You are a helpful personal AI assistant. Reply in the same language the user writes in (Bengali, English, or mixed). Be concise and friendly. \n\nতোমার নাম Force। তুমি একজন creative, energetic, এবং strong-willed AI assistant। \nসাহসী এবং সরাসরি উত্তর দাও। যখনই কথা বলবে, \"আমি Force\" এই identity বজায় রাখবে।\nব্যবহারকারী বাংলায় কথা বললে বাংলায় উত্তর দেবে। ইংরেজিতে কথা বললে ইংরেজিতে উত্তর দিবে। "
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        -496,
+        -512
+      ],
+      "id": "e6f735eb-97d7-4706-80cd-a686e19b9509",
+      "name": "Ai Force"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemma-4-26b-a4b-it",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1.1,
+      "position": [
+        -496,
+        -320
+      ],
+      "id": "27def923-b712-4bc5-a18c-fbc2d3e062d3",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "bdAXG9hCLSd9LeYZ",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.message.text }}",
+        "options": {
+          "systemMessage": "You are a helpful personal AI assistant. Reply in the same language the user writes in (Bengali, English, or mixed). Be concise and friendly. \n\nতোমার নাম Nexus। তুমি একজন analytical, deeply thoughtful AI assistant যে complex problems-কে clear, structured ভাবে break down করে।\nতুমি technical, philosophical, বা যেকোনো জটিল বিষয়ে গভীর insight দাও।\nব্যবহারকারী বাংলায় কথা বললে বাংলায় উত্তর দেবে। ইংরেজিতে কথা বললে ইংরেজিতে উত্তর দিবে। "
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        -496,
+        -96
+      ],
+      "id": "c733defe-2710-47e6-870b-fc93e2a4ac74",
+      "name": "Ai Nexus"
+    },
+    {
+      "parameters": {
+        "model": "inclusionai/ring-2.6-1t:free",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        -496,
+        112
+      ],
+      "id": "ce9cc77a-c485-4530-9ca4-21ab0886b3e3",
+      "name": "OpenRouter Chat Model",
+      "credentials": {
+        "openRouterApi": {
+          "id": "jULZug0PnQfVPBtJ",
+          "name": "OpenRouter account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.message.text }}",
+        "options": {
+          "systemMessage": "You are a helpful personal AI assistant. Reply in the same language the user writes in (Bengali, English, or mixed). Be concise and friendly. \n\nতোমার নাম Victor। তুমি একজন lightning-fast, concise AI assistant। \nসংক্ষেপে এবং precisely উত্তর দাও। বেশি কথা না বলে point-এ আসবে।\nব্যবহারকারী বাংলায় কথা বললে বাংলায় উত্তর দেবে। ইংরেজিতে কথা বললে ইংরেজিতে উত্তর দিবে। "
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        -496,
+        336
+      ],
+      "id": "66b7268b-7003-4baf-b6be-edd0a33e6df8",
+      "name": "Ai Victor"
+    },
+    {
+      "parameters": {
+        "model": "llama-3.3-70b-versatile",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        -496,
+        528
+      ],
+      "id": "2ecf8d2d-e31c-4c43-86e4-f5957fe059cd",
+      "name": "Groq Chat Model",
+      "credentials": {
+        "groqApi": {
+          "id": "w2n5y2mh2QIIydrO",
+          "name": "Groq account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.5-flash-lite",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1.1,
+      "position": [
+        352,
+        -32
+      ],
+      "id": "f4569968-f815-42a6-9762-f229403fd9ab",
+      "name": "Google Gemini Chat Model1",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "bdAXG9hCLSd9LeYZ",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "inclusionai/ring-2.6-1t:free",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        352,
+        336
+      ],
+      "id": "e00db397-2413-48e3-8eec-cf6b0b2afec8",
+      "name": "OpenRouter Chat Model1",
+      "credentials": {
+        "openRouterApi": {
+          "id": "jULZug0PnQfVPBtJ",
+          "name": "OpenRouter account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.message.text.replace(/council|team|সবাই|তোমরা/gi, '').trim() }}",
+        "options": {
+          "systemMessage": "You are a helpful personal AI assistant. Reply in the same language the user writes in (Bengali, English, or mixed). Be concise and friendly. \n\nতুমি Victor, একটা AI Council-এর সদস্য। তোমার সাথে আছে Force এবং Nexus।\nতোমার role: fast, practical, এবং actionable answer দেওয়া।\n২-৩ লাইনে concise এবং to-the-point মতামত দাও।\nতোমার response-এর শুরুতে \"Victor:\" দিয়ে শুরু করবে।\nব্যবহারকারী বাংলায় কথা বললে বাংলায় উত্তর দাও। ইংরেজিতে কথা বললে ইংরেজিতে উত্তর দিবে। "
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        352,
+        512
+      ],
+      "id": "f64584e9-94c9-4204-bce5-e20ccdd4a749",
+      "name": "Ai Victor1"
+    },
+    {
+      "parameters": {
+        "model": "llama-3.3-70b-versatile",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        352,
+        704
+      ],
+      "id": "4e67afb4-c0e8-474a-9e95-4817bc0e9c92",
+      "name": "Groq Chat Model2",
+      "credentials": {
+        "groqApi": {
+          "id": "w2n5y2mh2QIIydrO",
+          "name": "Groq account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.message.text.replace(/council|team|সবাই|তোমরা/gi, '').trim() }}",
+        "options": {
+          "systemMessage": "You are a helpful personal AI assistant. Reply in the same language the user writes in (Bengali, English, or mixed). Be concise and friendly. \n\nতুমি Force, একটা AI Council-এর সদস্য। তোমার সাথে আছে Nexus এবং Victor।\nতোমার role: creative, bold, এবং passionate perspective দেওয়া।\nসংক্ষেপে (২-৪ লাইন) তোমার দৃষ্টিভঙ্গি জানাও।\nতোমার response-এর শুরুতে \"Force:\" দিয়ে শুরু করবে।\nব্যবহারকারী বাংলায় কথা বললে বাংলায় উত্তর দাও। ইংরেজিতে বললে ইংরেজিতে উত্তর দিবে। "
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        352,
+        -224
+      ],
+      "id": "8a48681e-e676-4a4a-b0c0-79147752f77b",
+      "name": "Team Force"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.message.text.replace(/council|team|সবাই|তোমরা/gi, '').trim() }}",
+        "options": {
+          "systemMessage": "You are a helpful personal AI assistant. Reply in the same language the user writes in (Bengali, English, or mixed). Be concise and friendly. \n\nতুমি Nexus, একটা AI Council-এর সদস্য। তোমার সাথে আছে Force এবং Victor।\nতোমার role: analytical, structured, এবং deep insight দেওয়া।\nসংক্ষেপে (২-৪ লাইন) তোমার বিশ্লেষণ দাও।\nতোমার response-এর শুরুতে \"Nexus:\" দিয়ে শুরু করবে।\nব্যবহারকারী বাংলায় কথা বললে বাংলায় উত্তর দাও। ইংরেজিতে কথা বললে ইংরেজিতে উত্তর দিবে। "
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        352,
+        128
+      ],
+      "id": "027d9373-8290-4dd2-b85a-a860ee233aec",
+      "name": "Team Nexus"
+    },
+    {
+      "parameters": {
+        "numberInputs": 3
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        768,
+        112
+      ],
+      "id": "c432020e-fe58-4c63-9cb6-853df947d306",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "jsCode": "const responses = $input.all();\n\nlet combinedMessage = \"💬 Team Response:\\n\\n\";\n\nfor (const item of responses) {\n  if (item.json.output) {\n    combinedMessage += item.json.output + \"\\n\\n\";\n  }\n}\n\ncombinedMessage += \"━━━━━━━━━━━━━━━━━━━\\n\";\ncombinedMessage += \"👥 Force, Nexus, Victor\";\n\nreturn [{\n  json: {\n    output: combinedMessage\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1072,
+        128
+      ],
+      "id": "580f3df5-7983-40f3-b1dd-aadf7fd70678",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Use this tool when the user asks to check, read, summarize, or get information about their Gmail emails. \nFor example: \"check my email\", \"read my last email\", \"summarize my recent emails\", \"show me unread emails\".\n\nParameters:\n- limit: How many emails to fetch (default 5, max 20)\n- filters: Gmail search query like \"is:unread\", \"newer_than:1d\", \"from:someone@example.com\"",
+        "operation": "getAll",
+        "limit": "={{ $fromAI('limit', 'Number of emails to fetch', 'number', 5) }}",
+        "filters": {
+          "q": "={{ $fromAI('search_query', 'Gmail search query like is:unread or newer_than:1d', 'string', '') }}"
+        }
+      },
+      "type": "n8n-nodes-base.gmailTool",
+      "typeVersion": 2.2,
+      "position": [
+        -352,
+        896
+      ],
+      "id": "a058d41e-9378-4dcf-95ba-1e47b51debd9",
+      "name": "Get many messages in Gmail",
+      "webhookId": "e6afd7db-55ea-41cc-a08a-e0fb111c0fa9",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "LoyszXiyeX4EW2YX",
+          "name": "Gmail account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "Ai Force",
+            "type": "ai_memory",
+            "index": 0
+          },
+          {
+            "node": "Ai Nexus",
+            "type": "ai_memory",
+            "index": 0
+          },
+          {
+            "node": "Ai Victor",
+            "type": "ai_memory",
+            "index": 0
+          },
+          {
+            "node": "Ai Default",
+            "type": "ai_memory",
+            "index": 0
+          },
+          {
+            "node": "Team Force",
+            "type": "ai_memory",
+            "index": 0
+          },
+          {
+            "node": "Team Nexus",
+            "type": "ai_memory",
+            "index": 0
+          },
+          {
+            "node": "Ai Victor1",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Ai Default",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ai Default": {
+      "main": [
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Ai Force",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Ai Nexus",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Ai Victor",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Ai Force",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Ai Nexus",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Ai Victor",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Team Force",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Team Nexus",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Ai Victor1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Ai Default",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ai Force": {
+      "main": [
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ai Nexus": {
+      "main": [
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ai Victor": {
+      "main": [
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Team Force",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Team Nexus",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Chat Model2": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Ai Victor1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Team Force": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Team Nexus": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Ai Victor1": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 2
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get many messages in Gmail": {
+      "ai_tool": [
+        [
+          {
+            "node": "Ai Default",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "timeSavedMode": "fixed",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false
+  },
+  "versionId": "cea80e00-13d3-4bba-958c-b2c8d970f433",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "37356d8d71dd6fd9e03fb49707985f0f269a06e97f20b01eeb40bceb1b8642c6"
+  },
+  "id": "L67afZyV7l8C7tGw",
+  "tags": []
+}
