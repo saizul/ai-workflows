@@ -1,0 +1,147 @@
+---
+
+## ✨ Features
+
+- 🔀 **Intent-based routing** — a Switch node directs each message to the correct agent (Force / Nexus / Victor / Team / Sizu).
+- 🧩 **Specialized AI agents** — every agent has its own system prompt, model, memory, and tools.
+- 🌐 **Multi-model support** — Google Gemini, Groq, and OpenRouter run side by side, so you pick the right model per task.
+- 🧠 **Shared conversational memory** — a Simple Memory node keeps context consistent across agents.
+- 🤝 **Sub-agents (Team Force & Team Nexus)** — top-level agents delegate to sub-agents for deeper, multi-step reasoning.
+- 📧 **Gmail integration** — the default agent can read inbox messages and answer questions about them.
+- 🧱 **Parallel execution + Merge** — multiple agents can run in parallel; their outputs are merged into one structured response.
+- 🪄 **Post-processing layer** — a JavaScript Code node cleans, formats, and structures the final reply before sending it back to Telegram.
+
+---
+
+## 🏗️ Architecture
+
+| Component | Role |
+|---|---|
+| **Telegram Trigger** | Captures every incoming message from the user |
+| **Switch (Rules mode)** | Reads the message and routes to one of 5 agents |
+| **Ai Force** | Action/execution-focused agent (Gemini) — delegates to Team Force |
+| **Ai Nexus** | Connector/integration agent (OpenRouter) — delegates to Team Nexus |
+| **Ai Victor** | Analytical agent (Groq — fast inference) |
+| **Ai Victor1** | Secondary analytical agent (Groq) for follow-up reasoning |
+| **Ai Default** | Fallback agent with Gmail tool access |
+| **Team Force / Team Nexus** | Sub-agents for multi-step, deeper task handling |
+| **Simple Memory** | Shared conversational context across agents |
+| **Merge (append)** | Combines outputs from up to 3 parallel agent runs |
+| **Code in JavaScript** | Formats and cleans the final reply |
+| **Send a Text Message** | Delivers the final reply back to the Telegram user |
+
+---
+
+## 🤖 The Agents
+
+### 1. Ai Force — `Gemini`
+The "doer." Handles task execution, generation, and action-oriented requests. Delegates complex jobs to **Team Force** sub-agent.
+
+### 2. Ai Nexus — `OpenRouter`
+The "connector." Bridges different data sources and integrations. Hands off multi-tool flows to **Team Nexus** sub-agent.
+
+### 3. Ai Victor / Ai Victor1 — `Groq`
+The "thinkers." Use Groq for ultra-fast inference on reasoning, summaries, and follow-ups.
+
+### 4. Ai Default — `Groq + Gmail Tool`
+The "concierge." Picks up anything not matched by the router and can read Gmail to answer mailbox-related queries.
+
+### 5. Sizu Route *(reserved)*
+A reserved channel for the operator (Saizul) — admin-level commands and meta-operations on the workflow itself.
+
+---
+
+## 🛠️ Tech Stack
+
+- **Orchestration:** [n8n](https://n8n.io) (self-hosted / cloud)
+- **Messaging Layer:** Telegram Bot API
+- **AI Models:**
+  - Google Gemini (Chat Model)
+  - Groq (Chat Model)
+  - OpenRouter (Chat Model — multi-provider access)
+- **Tools / Integrations:** Gmail (read messages)
+- **Memory:** n8n Simple Memory
+- **Post-processing:** JavaScript (Code node)
+
+---
+
+## 🚀 Getting Started
+
+### Prerequisites
+- An n8n instance (self-hosted via Docker or n8n Cloud)
+- A Telegram bot token ([@BotFather](https://t.me/BotFather))
+- API keys for: **Google Gemini**, **Groq**, **OpenRouter**
+- A Google account connected for **Gmail OAuth**
+
+### Setup
+
+1. **Clone this repository**
+```bash
+   git clone https://github.com/saizulamin/multi-agent-ai-orchestrator.git
+```
+
+2. **Import the workflow into n8n**
+   - Open n8n → `Workflows` → `Import from File`
+   - Select `workflow.json` from this repo
+
+3. **Add credentials in n8n**
+   - Telegram API
+   - Google Gemini API
+   - Groq API
+   - OpenRouter API
+   - Gmail OAuth2
+
+4. **Configure the Switch routing rules**
+   - Open the **Switch** node and set keywords/conditions for each route (Force / Nexus / Victor / Team / Sizu) according to your use case.
+
+5. **Activate the workflow** and message your Telegram bot.
+
+---
+
+## 💬 Example Usage
+
+| You type… | Routes to… | What happens |
+|---|---|---|
+| `force build me a landing page outline` | **Ai Force → Team Force** | Generates a structured landing-page plan |
+| `nexus connect my email and summarize today's leads` | **Ai Nexus → Team Nexus** | Pulls Gmail, structures lead data |
+| `victor analyze this campaign report` | **Ai Victor** | Fast analytical breakdown |
+| `team brainstorm 5 ad angles` | **Team agents** | Multi-step reasoning |
+| *anything else* | **Ai Default** | Fallback agent with Gmail access |
+
+---
+
+## 🗺️ Roadmap
+
+- [ ] Add a vector database (Pinecone / Qdrant) for long-term memory
+- [ ] Add a Notion / Google Sheets logging layer for every conversation
+- [ ] Add a WhatsApp trigger alongside Telegram
+- [ ] Add automatic intent classification (LLM-based instead of keyword rules)
+- [ ] Add a web dashboard for monitoring agent activity
+
+---
+
+## 📸 Workflow Diagram
+
+![Workflow Architecture](./assets/workflow-diagram.png)
+
+---
+
+## 👤 Author
+
+**Md. Saizul Amin**
+AI Automation Specialist • Digital Marketing Strategist • IT Consultant
+
+- 🌐 Website: [saizul.com](https://www.saizul.com)
+- 📧 Email: saizulamin@gmail.com
+- 💼 LinkedIn: *add your link*
+- 🐙 GitHub: [@saizulamin](https://github.com/saizulamin)
+
+---
+
+## 📄 License
+
+MIT License — feel free to use, modify, and adapt. Attribution appreciated.
+
+---
+
+⭐ **If this project helps you, please star the repo!**
