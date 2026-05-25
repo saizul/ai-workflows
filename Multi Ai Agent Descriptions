@@ -1,0 +1,11 @@
+# 🤖 Multi-Agent AI Orchestrator (n8n Workflow)
+
+A multi-agent AI system built on **n8n** that routes user messages from Telegram to specialized AI agents based on intent, runs them in parallel where needed, merges their outputs, and delivers a unified response — all through a single Telegram chat interface.
+
+> Built and maintained by **Md. Saizul Amin** — AI Automation Specialist
+
+---
+
+## 🧠 Overview
+
+This workflow turns a single Telegram bot into a **command center for multiple AI agents**, each with its own role, model, and tools. Instead of relying on one large model for everything, the system **routes each request to the right specialist** — cutting cost, improving accuracy, and giving you full control over each agent's behavior.
